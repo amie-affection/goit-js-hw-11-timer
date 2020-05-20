@@ -60,8 +60,13 @@ let timer = setInterval(function () {
   const secs = Math.floor((time % (1000 * 60)) / 1000);
   // console.log(secs);
 
-  refs.days.innerText = ("0" + days).slice(-2);
+  days <= 9
+    ? (refs.days.innerText = "0" + days)
+    : (refs.days.innerText = days);
+
   refs.hours.innerText = ("0" + hours).slice(-2);
   refs.mins.innerText = ("0" + mins).slice(-2);
   refs.secs.innerText = ("0" + secs).slice(-2);
+
+  console.log(refs.days.innerText.length);
 }, 1000);
