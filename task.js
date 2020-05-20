@@ -11,62 +11,94 @@
 
 // Плагин это класс CountdownTimer, экземпляр которого создает новый таймер с настройками.
 
-const targetDate = new Date(2020, 6, 17);
-console.log(targetDate);
+// const targetDate = new Date(2020, 6, 17);
+// console.log(targetDate);
 
-const refs = {
-  days: document.querySelector('[data-value="days"]'),
-  hours: document.querySelector('[data-value="hours"]'),
-  mins: document.querySelector('[data-value="mins"]'),
-  secs: document.querySelector('[data-value="secs"]'),
+class CountdownTimer {
+  constructor({ selector, targetDate }) {
+    this.selector = document.querySelector(selector);
 
-};
+    this.days = this.selector.querySelector('[data-value="days"]');
+    this.hours = this.selector.querySelector('[data-value="hours"]');
+    this.mins = this.selector.querySelector('[data-value="mins"]');
+    this.secs = this.selector.querySelector('[data-value="secs"]');
 
-let timer = setInterval(function () {
-  let now = new Date().getTime();
-  let time = targetDate - now;
-  // console.log(now);
-  // console.log(time);
+    this.targetDate = targetDate.getTime();
+    this.timeCount();
+    this.updateTime();
+  }
 
-  // Для подсчета значений используй следующие готовые формулы,
-  // где time - разница между targetDate и текущей датой.
-  
-  /*
-   * Оставшиеся дни: делим значение UTC на 1000 * 60 * 60 * 24, количество
-   * миллисекунд в одном дне (миллисекунды * секунды * минуты * часы)
-   */
-  const days = Math.floor(time / (1000 * 60 * 60 * 24));
-  // console.log(days);
-  
-  /*
-   * Оставшиеся часы: получаем остаток от предыдущего расчета с помощью оператора
-   * остатка % и делим его на количество миллисекунд в одном часе
-   * (1000 * 60 * 60 = миллисекунды * минуты * секунды)
-   */
-  const hours = Math.floor((time % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  // console.log(hours);
-  
-  /*
-   * Оставшиеся минуты: получаем оставшиеся минуты и делим их на количество
-   * миллисекунд в одной минуте (1000 * 60 = миллисекунды * секунды)
-   */
-  const mins = Math.floor((time % (1000 * 60 * 60)) / (1000 * 60));
-  // console.log(mins);
-  
-  /*
-   * Оставшиеся секунды: получаем оставшиеся секунды и делим их на количество
-   * миллисекунд в одной секунде (1000)
-   */
-  const secs = Math.floor((time % (1000 * 60)) / 1000);
-  // console.log(secs);
+  timeCount() {
+    let now = Date.now();
+    // console.log(now);
+    let time = this.targetDate - now;
+    if (now >= this.targetDate) {
+      this.currentTime(0);
+      return;
+    }
+    this.currentTime(time);
+  }
 
-  days <= 9
-    ? (refs.days.innerText = "0" + days)
-    : (refs.days.innerText = days);
+  updateTime() {
+    let timer = setInterval(() => {
+      let now = Date.now();
+      // console.log(now);
+      let time = this.targetDate - now;
+      this.currentTime(time);
+      if (now >= this.targetDate) {
+        clearInterval(timer);
+        this.currentTime(0);
+      }
+    }, 1000);
+  }
 
-  refs.hours.innerText = ("0" + hours).slice(-2);
-  refs.mins.innerText = ("0" + mins).slice(-2);
-  refs.secs.innerText = ("0" + secs).slice(-2);
+  currentTime(time) {
+    /*
+     * Оставшиеся дни: делим значение UTC на 1000 * 60 * 60 * 24, количество
+     * миллисекунд в одном дне (миллисекунды * секунды * минуты * часы)
+     */
+    const days = Math.floor(time / (1000 * 60 * 60 * 24));
+    // console.log(days);
 
-  console.log(refs.days.innerText.length);
-}, 1000);
+    /*
+     * Оставшиеся часы: получаем остаток от предыдущего расчета с помощью оператора
+     * остатка % и делим его на количество миллисекунд в одном часе
+     * (1000 * 60 * 60 = миллисекунды * минуты * секунды)
+     */
+    const hours = Math.floor((time % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    // console.log(hours);
+
+    /*
+     * Оставшиеся минуты: получаем оставшиеся минуты и делим их на количество
+     * миллисекунд в одной минуте (1000 * 60 = миллисекунды * секунды)
+     */
+    const mins = Math.floor((time % (1000 * 60 * 60)) / (1000 * 60));
+    // console.log(mins);
+
+    /*
+     * Оставшиеся секунды: получаем оставшиеся секунды и делим их на количество
+     * миллисекунд в одной секунде (1000)
+     */
+    const secs = Math.floor((time % (1000 * 60)) / 1000);
+    // console.log(secs);
+    this.refs(days, hours, mins, secs);
+  }
+
+  refs(day, hour, min, sec) {
+    this.days.innerText = this.pad(day);
+    this.hours.innerText = this.pad(hour);
+    this.mins.innerText = this.pad(min);
+    this.secs.innerText = this.pad(sec);
+  }
+
+  pad(text) {
+    return String(text).padStart(2, "0");
+  }
+}
+
+const timerCounter = new CountdownTimer({
+  selector: "#timer-1",
+  targetDate: new Date("Jul 17, 2030"),
+});
+console.log(timerCounter);
+console.log(Date.now());
